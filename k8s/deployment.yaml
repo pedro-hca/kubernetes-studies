@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: goserver
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -16,4 +16,19 @@ spec:
     spec:
       containers:
         - name: goserver
-          image: "pedrohca/kube-go:v2"
+          image: "pedrohca/kube-go:v7"
+          envFrom:
+            - configMapRef:
+                name: goserver-env
+
+          volumeMounts:
+            - mountPath: "/go/myTasks"
+              name: config
+
+      volumes:
+        - name: config
+          configMap:
+            name: configmap-task
+            items:
+            - key: tasks
+              path: "task.txt"  
