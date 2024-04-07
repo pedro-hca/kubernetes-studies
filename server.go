@@ -40,7 +40,7 @@ func ConfigMap(w http.ResponseWriter, r *http.Request) {
 
 func Healthz(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(startedAt)
-	if duration.Seconds() > 100 {
+	if duration.Seconds() < 10 || duration.Seconds() > 30 {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		w.Write([]byte(fmt.Sprintf("Duration: %v", duration.Seconds())))
 	} else {
