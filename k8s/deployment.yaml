@@ -16,10 +16,27 @@ spec:
     spec:
       containers:
         - name: goserver
-          image: "pedrohca/kube-go:v7"
+          image: "pedrohca/kube-go:v7.5"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 3
+            failureThreshold: 1
+
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 80
+          #   periodSeconds: 5
+          #   failureThreshold: 3
+          #   timeoutSeconds: 20
+          #   successThreshold: 1
           envFrom:
             - configMapRef:
                 name: goserver-env
+            - secretRef:
+                name: goserver-secret
 
           volumeMounts:
             - mountPath: "/go/myTasks"
