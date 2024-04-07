@@ -1,51 +1,76 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "goserver"
+  name: "goserver" # Nome do Deployment, identifica unicamente dentro do namespace.
   labels:
-    app: "goserver"
+    app: "goserver" # Rótulos para associar este Deployment com outros recursos, como Services.
 spec:
   selector:
-    matchLabels:
+    matchLabels: # Define quais Pods serão gerenciados por este Deployment, baseado nos labels.
       app: goserver
-  replicas: 1
+  replicas: 1 # Número desejado de réplicas do Pod.
   template:
     metadata:
       labels:
-        app: "goserver"
+        app: "goserver" # Labels aplicados aos Pods criados por este Deployment.
     spec:
       containers:
         - name: goserver
-          image: "pedrohca/kube-go:v7.5"
-          readinessProbe:
+          image: "pedrohca/kube-go:v7.7"  # Imagem do container que será executada nos Pods.
+
+          resources: # Limites e solicitações de recursos para cada container.
+            requests:
+              cpu: "0.05"  # Quantidade mínima de CPU garantida pelo agendador.
+              memory: 20Mi  # Quantidade mínima de memória garantida pelo agendador.
+            limits:
+              cpu: "0.05"  # Limite máximo de CPU que o container pode utilizar.
+              memory: 25Mi # Limite máximo de memória que o container pode utilizar.
+
+          startupProbe:  # Verifica se a aplicação dentro do container iniciou corretamente.
             httpGet:
               path: /healthz
               port: 80
-            periodSeconds: 3
+            periodSeconds: 3  # Intervalo entre as verificações.
+            failureThreshold: 30 # Número máximo de tentativas antes de considerar a inicialização como falhada.
+
+          readinessProbe: # Verifica se o container está pronto para receber tráfego.
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 3 # Intervalo entre as verificações.
+            failureThreshold: 1 # Falhas permitidas antes de retirar o Pod do serviço.
+            # initialDelaySeconds: 10
+
+          livenessProbe: # Verifica se o container está vivo (funcionando corretamente).
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5 # Intervalo entre as verificações.
             failureThreshold: 1
+            timeoutSeconds: 1 # Tempo antes da sonda considerar o teste como falhado.
+            successThreshold: 1 # Necessário para considerar a sonda bem-sucedida após falha.
+            # initialDelaySeconds: 15
 
-          # livenessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 80
-          #   periodSeconds: 5
-          #   failureThreshold: 3
-          #   timeoutSeconds: 20
-          #   successThreshold: 1
-          envFrom:
+          envFrom: # Define as variáveis de ambiente do container.
             - configMapRef:
-                name: goserver-env
+                name: goserver-env # Variáveis de ambiente definidas em um ConfigMap.
             - secretRef:
-                name: goserver-secret
+                name: goserver-secret # Variáveis de ambiente definidas em um Secret.
 
-          volumeMounts:
+          volumeMounts: # Monta volumes dentro do container.
             - mountPath: "/go/myTasks"
               name: config
+              readOnly: true # Monta o volume como somente leitura.
+            - mountPath: "/go/pvc"
+              name: goserver-volume # Monta um volume proveniente de um PVC.
 
-      volumes:
+      volumes: # Define os volumes usados pelos containers.
+        - name: goserver-volume
+          persistentVolumeClaim:
+            claimName: goserver-pvc # Volume persistente baseado em um PVC existente.
         - name: config
           configMap:
-            name: configmap-task
+            name: configmap-task # Volume criado a partir de um ConfigMap.
             items:
             - key: tasks
-              path: "task.txt"  
+              path: "task.txt"  # Especifica itens individuais do ConfigMap para serem montados.

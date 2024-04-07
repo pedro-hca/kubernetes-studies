@@ -1,0 +1,12 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: goserver-hpa  # Nome do HorizontalPodAutoscaler para identificação única.
+spec:
+  scaleTargetRef:  # Referência para o recurso que será escalonado automaticamente.
+    apiVersion: apps/v1
+    kind: Deployment
+    name: goserver  # Nome do Deployment que será escalonado.
+  minReplicas: 1  # Número mínimo de réplicas de pods.
+  maxReplicas: 30  # Número máximo de réplicas de pods.
+  targetCPUUtilizationPercentage: 25 

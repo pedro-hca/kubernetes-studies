@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: goserver-env
-data:
+  name: goserver-env # Nome do ConfigMap para identificação única.
+data: # Dados armazenados no ConfigMap.
   NAME: "Pedro"
   AGE: "28"

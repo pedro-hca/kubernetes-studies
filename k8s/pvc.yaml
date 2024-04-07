@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim # no pvc eu solicito o volume que aprovisionei no pv
+metadata:
+  name: goserver-pvc # Nome do PersistentVolumeClaim para identificação única.
+spec:
+  accessModes:
+    - ReadWriteOnce # Modo de acesso ao volume. Permite leitura e escrita por apenas um nó (ReadWriteOnce).
+  resources:
+    requests:
+      storage: 5Gi # Capacidade de armazenamento solicitada para o PersistentVolumeClaim.

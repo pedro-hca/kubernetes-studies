@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql  Nome do StatefulSet para identificação única.
+spec:
+  replicas: 4  # Número desejado de réplicas de pods.
+  serviceName: mysql-h # Nome do serviço que será usado para o conjunto de estado. O mesmo nome deve ser usado no Service correspondente.
+  # podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: mysql  # Rótulo usado para selecionar os pods pertencentes a este StatefulSet.
+  template:
+    metadata:
+      labels:
+        app: mysql # Rótulo aplicado aos pods criados pelo StatefulSet.
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+          env: # variaveis de ambiente do db
+            - name: MYSQL_ROOT_PASSWORD
+              value: root # Variável de ambiente definida para a senha do root do MySQL.
+          volumeMounts: #volume para cada pod, mesmo caindo e subindo as replicas o volume continua o mesmo
+            - mountPath: /var/lib/mysql
+              name: mysql-volume # Nome do volume montado em cada pod.
+              
+  volumeClaimTemplates: # template de volume dinamico que vai ser criado para cada pod do statefulset
+  - metadata:
+      name: mysql-volume  # Nome do volume persistente que será provisionado para cada pod.
+    spec:
+      accessModes:
+        - ReadWriteOnce # Modo de acesso ao volume. Permite leitura e escrita por apenas um nó (ReadWriteOnce).
+      resources:
+        requests:
+          storage: 5Gi # Capacidade de armazenamento solicitada para cada volume persistente.

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service #Headless service
+metadata:
+  name: mysql-h # Name do service igual ao serviceName no statefulset
+spec: # dentro do pod vc tem acesso ao (nome do pod).mysql-h, exemplo mysql-0.mysql-h, como por ex no caso de ter uma aplicaçao go e 3 pods mysql rodando
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+  clusterIP: None # Precisa ser none para nao puxar por IP
+

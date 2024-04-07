@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: PersistentVolume # persiste os dados no cluster, mesmo mudando de pod os dados continuam la. ATENÇAO!!! ReadWriteOnce permite compartilhar volume no memso node.
+metadata:
+  name: pv1 # Nome do PersistentVolume para identificação única.
+spec:
+  capacity:
+    storage: 50Gi # Capacidade de armazenamento do PersistentVolume.
+  accessModes:
+    - ReadWriteOnce # Modo de acesso ao volume. Permite leitura e escrita por apenas um nó (ReadWriteOnce).

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: goserver-service
+  name: goserver-service  # Nome do Service para identificação única.
 spec:
   selector:
-    app: goserver
-  type: LoadBalancer
+    app: goserver  # Seleciona os pods que pertencem ao aplicativo "goserver".
+  type: LoadBalancer  # Define o tipo de serviço como LoadBalancer, permitindo que o serviço seja acessível externamente através de um balanceador de carga.
   ports:
-  - name: goserver-service
-    port: 80
-    targetPort: 80
-    protocol: TCP
+  - name: goserver-service  # Nome do porto do serviço para identificação.
+    port: 80  # Porta do serviço. O serviço será acessível através da porta 80.
+    targetPort: 80  # Porta nos pods para os quais o tráfego será direcionado.
+    protocol: TCP  # Protocolo de comunicação utilizado (TCP neste caso).
