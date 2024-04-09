@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-host  # Nome do recurso Ingress
+  annotations:  # Anotações adicionais para o Ingress
+    cert-manager.io/cluster-issuer: "letsencrypt"  # Definição do emissor do certificado SSL
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: "nginx"  # Classe do controlador de Ingress a ser usado
+
+  # Regras de roteamento do Ingress
+  rules:
+  - host: "ingress.goserver.com.br"  # Host externo para o qual o tráfego será roteado
+
+    # Configuração para rotear tráfego HTTP
+    http:
+      paths:
+      - pathType: Prefix  # Tipo de caminho, neste caso, Prefixo
+        path: "/"  # Caminho raiz
+
+        # Backend para o roteamento do tráfego
+        backend:
+          service:
+            name: goserver-service  # Nome do serviço interno
+            port:
+              number: 80  # Porta do serviço interno
+  # Configuração de TLS para o tráfego HTTPS
+  tls:
+  - hosts:
+    - "ingress.goserver.com.br" # Host para o qual o certificado SSL será emitido
+    secretName: letsencrypt-tls # Nome do segredo Kubernetes que armazena o certificado SSL
+
+# O ingress-nginx controller é um componente do Kubernetes que gerencia o tráfego de entrada HTTP/HTTPS.
+# Ele atua como um controlador de Ingress, roteando o tráfego externo para os serviços internos
+# baseando-se nas regras definidas nos recursos Ingress. É responsável por gerenciar as regras de roteamento,
+# balanceamento de carga, terminação SSL e outras configurações relacionadas ao tráfego de entrada no cluster Kubernetes.
