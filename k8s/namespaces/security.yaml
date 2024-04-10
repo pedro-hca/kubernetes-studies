@@ -1,0 +1,46 @@
+# Define uma ServiceAccount chamada "server".
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: server
+  namespace: prod  # Esta ServiceAccount será criada no namespace "prod".
+
+---
+
+# Define uma Role chamada "server-read".
+apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRole # Aplica para o cluster
+kind: Role
+metadata:
+  name: server-read
+  namespace: prod  # Esta Role será criada no namespace "prod".
+rules:
+# Permissões para acessar recursos Pods e Services com os verbos get, watch e list.
+- apiGroups: [""]
+  resources: ["pods", "services"]
+  verbs: ["get", "watch", "list"]
+# Permissões para acessar recursos Deployments com os verbos get, watch e list.
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "watch", "list"]
+
+---
+
+# Define uma RoleBinding chamada "server-read-bind".
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+# kind: ClusterRoleBinding # Aplica para o cluster
+metadata:
+  name: server-read-bind
+  namespace: prod  # Este RoleBinding será criado no namespace "prod".
+subjects:
+# Define a ServiceAccount "server" como o assunto do RoleBinding.
+- kind: ServiceAccount
+  name: server
+  namespace: prod  # A ServiceAccount "server" está no namespace "prod".
+roleRef:
+# Define a Role "server-read" como a referência para este RoleBinding.
+  # kind: ClusterRole # Aplica para o cluster
+  kind: Role
+  name: server-read
+  apiGroup: rbac.authorization.k8s.io
